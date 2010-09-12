@@ -1,31 +1,34 @@
+# TODO
+# - find pld packages: rsvg2-sharp wnck-sharp
 Summary:	Novell Moonlight
 Name:		mono-moonlight
-Version:	@VERSION@
-Release:	0
-License:	LGPL v2.0 only ; MIT License (or similar) ; Ms-Pl
+Version:	3.0
+Release:	0.1
+License:	LGPL v2, MIT License (or similar), MS-PL
 Group:		X11/Applications/Multimedia
 URL:		http://go-mono.com/moonlight/
-ExclusiveArch:	%{ix86{ %{x8664}
-BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
-Source0:	%{name}-%{version}.tar.bz2
+Source0:	http://download.github.com/mono-moon-moon-0.8-10290-g3ff068e.tar.gz
+# Source0-md5:	24967265d29388c52df72135a9582b74
 # Always required
 BuildRequires:	cairo-devel >= 1.8.4
+BuildRequires:	expat-devel
 BuildRequires:	gtk+2-devel
-BuildRequires:	libexpat-devel
 BuildRequires:	libstdc++-devel
 # Technically these two could be optional
-BuildRequires:	alsa-devel
-BuildRequires:	gtk-sharp2
-BuildRequires:	libpulse-devel
+BuildRequires:	alsa-lib-devel
+BuildRequires:	dotnet-gtk-sharp2
 BuildRequires:	mono-devel >= 2.6
-BuildRequires:	monodoc-core
-BuildRequires:	rsvg2-sharp
-BuildRequires:	wnck-sharp
+BuildRequires:	mono-monodoc
+BuildRequires:	pulseaudio-devel
+#BuildRequires:	rsvg2-sharp
+#BuildRequires:	wnck-sharp
 BuildRequires:	xulrunner-devel
 BuildRequires:	zip
 # Required to build the desktop assemblies
 # Required to build the plugin
-BuildRequires:	libffmpeg-devel
+BuildRequires:	ffmpeg-devel
+ExclusiveArch:	%{ix86} %{x8664}
+BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
 Moonlight is an open source implementation of Microsoft Silverlight
@@ -33,7 +36,7 @@ for Unix systems.
 
 %package -n libmoon
 Summary:	Novell Moonlight
-License:	LGPL v2.0 only
+License:	LGPL v2
 Group:		X11/Applications/Multimedia
 Requires:	mono-core >= 2.6
 
@@ -43,7 +46,7 @@ for Unix systems.
 
 %package -n libmoon-devel
 Summary:	Development files for libmoon
-License:	LGPL v2.0 only
+License:	LGPL v2
 Group:		Libraries
 Requires:	mono-devel >= 2.6
 
@@ -55,9 +58,9 @@ for Unix systems.
 
 %package plugin
 Summary:	Novell Moonlight Browser Plugin
-License:	LGPL v2.0 only ; MIT License (or similar) ; Ms-Pl
+License:	LGPL v2, MIT License (or similar), MS-PL
 Group:		X11/Applications/Multimedia
-Requires:	libmoon0 == %{version}
+Requires:	libmoon = %{version}-%{release}
 Requires:	mono-core >= 2.6
 
 %description plugin
@@ -66,12 +69,11 @@ Novell Moonlight Browser Plugin.
 Moonlight is an open source implementation of Microsoft Silverlight
 for Unix systems.
 
-
 %package web-devel
 Summary:	Development files for Moonlight Web
-License:	MIT License (or similar) ; Ms-Pl
+License:	MIT License (or similar), MS-PL
 Group:		Development/Languages
-Recommends:	%{name}-plugin == %{version}
+Suggests:	%{name}-plugin = %{version}-%{release}
 
 %description web-devel
 Development files for creating Moonlight web applications.
@@ -81,9 +83,9 @@ for Unix systems.
 
 %package desktop
 Summary:	Mono bindings for Moonlight Desktop
-License:	MIT License (or similar) ; Ms-Pl
+License:	MIT License (or similar), MS-PL
 Group:		X11/Applications/Multimedia
-Requires:	libmoon0 == %{version}
+Requires:	libmoon = %{version}-%{release}
 
 %description desktop
 Mono bindings for Novell Moonlight.
@@ -93,13 +95,13 @@ for Unix systems.
 
 %package desktop-devel
 Summary:	Development files for Moonlight Desktop
-License:	MIT License (or similar) ; Ms-Pl
+License:	MIT License (or similar), MS-PL
 Group:		Development/Languages
-Recommends:	%{name}-tools == %{version}
-Requires:	%{name}-desktop == %{version}
+Requires:	%{name}-desktop = %{version}-%{release}
+Requires:	dotnet-gtk-sharp2
 Requires:	glib2-devel
-Requires:	gtk-sharp2
-Requires:	libmoon0 == %{version}
+Requires:	libmoon = %{version}-%{release}
+Suggests:	%{name}-tools = %{version}-%{release}
 
 %description desktop-devel
 Development files for Moonlight Desktop.
@@ -107,13 +109,12 @@ Development files for Moonlight Desktop.
 Moonlight is an open source implementation of Microsoft Silverlight
 for Unix systems.
 
-
 %package tools
 Summary:	Various tools for Novell Moonlight
 License:	MIT License (or similar)
 Group:		Development/Languages
-Requires:	%{name}-desktop == %{version}
-Requires:	libmoon0 == %{version}
+Requires:	%{name}-desktop = %{version}-%{release}
+Requires:	libmoon = %{version}-%{release}
 
 %description tools
 Various tools for Novell Moonlight.
@@ -122,19 +123,21 @@ Moonlight is an open source implementation of Microsoft Silverlight
 for Unix systems.
 
 %prep
-%setup -q
-%setup -q -T -D -b 1
-%setup -q -T -D -b 2
+%setup -qc
+mv mono-moon-*/* .
 
 %build
 # The plugin requires a complete build of it's own mono
 cd ../mono-%{included_mono}
 # We have not determined which --enable-minimal options might be safe
 # so please do not use any of them
-./configure --prefix=%{_builddir}/install \
-			--with-mcs-docs=no \
-			--with-ikvm-native=no
-%{__make} #%{?jobs:-j%jobs} # mono is not strictly -j safe
+./configure \
+	--prefix=%{_builddir}/install \
+	--with-mcs-docs=no \
+	--with-ikvm-native=no
+
+# mono is not strictly -j safe
+%{__make} -j1
 # This gets installed in the build dir so that it gets wiped away
 # and not installed on the system
 %{__make} install
@@ -143,12 +146,17 @@ cd -
 # And then we build moonlight
 # Only needed when there are Makefile.am or configure.ac patches
 #autoreconf -f -i -Wnone
-%configure --without-testing --without-performance --without-examples \
-		   --with-mcspath=%{_builddir}/mono-%{included_mono}/mcs \
-		   --with-mono-basic-path=%{_builddir}/mono-basic-%{included_mono} \
-		   --with-ffmpeg=%{with_ffmpeg} \
-		   --with-cairo=%{with_cairo}
-%{__make} %{?jobs:-j%jobs}
+%configure \
+	--without-testing \
+	--without-performance \
+	--without-examples \
+	--with-mcspath=%{_builddir}/mono-%{included_mono}/mcs \
+	--with-mono-basic-path=%{_builddir}/mono-basic-%{included_mono} \
+	--with-ffmpeg=%{with_ffmpeg} \
+	--with-cairo=%{with_cairo}
+
+%{__make}
+
 # The next lines would build the XPI if we wanted it
 # So that the xpi will pick up the custom libmono.so
 #export PKG_CONFIG_PATH=%{_builddir}/install/lib/pkgconfig:${PKG_CONFIG_PATH}
@@ -156,12 +164,15 @@ cd -
 
 %install
 rm -rf $RPM_BUILD_ROOT
-%{__make} install DESTDIR=$RPM_BUILD_ROOT
+%{__make} install \
+	DESTDIR=$RPM_BUILD_ROOT
+
 # Symlink the loader into browser-plugins for SUSE
 install -d $RPM_BUILD_ROOT%{_libdir}/browser-plugins
 ln -s %{_libdir}/moonlight/plugin/libmoonloader.so $RPM_BUILD_ROOT%{_libdir}/browser-plugins/libmoonloader.so
+
 # We don't like nasty .la files
-find $RPM_BUILD_ROOT -name \*.la -delete
+find $RPM_BUILD_ROOT -name '*.la' | xargs rm -v
 
 %clean
 rm -rf $RPM_BUILD_ROOT

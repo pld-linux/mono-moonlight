@@ -1,22 +1,27 @@
 # TODO
 # - find pld packages: rsvg2-sharp wnck-sharp
-Summary:	Novell Moonlight
+# - Release tarballs: http://ftp.novell.com/pub/mono/sources/moon/
+# - debian repo: http://git.debian.org/?p=pkg-mono/packages/moon.git
+# - fedora http://olea.org/paquetes-rpm/repoview/moonlight.html
+# - ubuntu http://packages.ubuntu.com/search?keywords=moonlight-plugin-mozilla
+Summary:	Free Software clone of Silverlight
 Name:		mono-moonlight
-Version:	3.0
+Version:	2.3
 Release:	0.1
 License:	LGPL v2, MIT License (or similar), MS-PL
 Group:		X11/Applications/Multimedia
-URL:		http://go-mono.com/moonlight/
-Source0:	http://download.github.com/mono-moon-moon-0.8-10290-g3ff068e.tar.gz
-# Source0-md5:	24967265d29388c52df72135a9582b74
-# Always required
+URL:		http://www.mono-project.com/Moonlight
+Source0:	http://ftp.novell.com/pub/mono/sources/moon/%{version}/moonlight-%{version}.tar.bz2
+# Source0-md5:	164c4a5068f85244a0019ce49a6ee629
+Patch0:		minizip.patch
+BuildRequires:	alsa-lib-devel
 BuildRequires:	cairo-devel >= 1.8.4
+BuildRequires:	dotnet-gtk-sharp2
 BuildRequires:	expat-devel
+BuildRequires:	ffmpeg-devel
 BuildRequires:	gtk+2-devel
 BuildRequires:	libstdc++-devel
-# Technically these two could be optional
-BuildRequires:	alsa-lib-devel
-BuildRequires:	dotnet-gtk-sharp2
+BuildRequires:	minizip-devel
 BuildRequires:	mono-devel >= 2.6
 BuildRequires:	mono-monodoc
 BuildRequires:	pulseaudio-devel
@@ -24,9 +29,6 @@ BuildRequires:	pulseaudio-devel
 #BuildRequires:	wnck-sharp
 BuildRequires:	xulrunner-devel
 BuildRequires:	zip
-# Required to build the desktop assemblies
-# Required to build the plugin
-BuildRequires:	ffmpeg-devel
 ExclusiveArch:	%{ix86} %{x8664}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -123,37 +125,27 @@ Moonlight is an open source implementation of Microsoft Silverlight
 for Unix systems.
 
 %prep
-%setup -qc
-mv mono-moon-*/* .
+%setup -q -n moonlight-%{version}
+%patch0 -p1
+
+rm -r pixman cairo src/zip curl
 
 %build
-# The plugin requires a complete build of it's own mono
-cd ../mono-%{included_mono}
-# We have not determined which --enable-minimal options might be safe
-# so please do not use any of them
-./configure \
-	--prefix=%{_builddir}/install \
-	--with-mcs-docs=no \
-	--with-ikvm-native=no
-
-# mono is not strictly -j safe
-%{__make} -j1
-# This gets installed in the build dir so that it gets wiped away
-# and not installed on the system
-%{__make} install
-cd -
-
-# And then we build moonlight
-# Only needed when there are Makefile.am or configure.ac patches
-#autoreconf -f -i -Wnone
+autoreconf -i -Wnone
 %configure \
 	--without-testing \
 	--without-performance \
 	--without-examples \
-	--with-mcspath=%{_builddir}/mono-%{included_mono}/mcs \
-	--with-mono-basic-path=%{_builddir}/mono-basic-%{included_mono} \
-	--with-ffmpeg=%{with_ffmpeg} \
-	--with-cairo=%{with_cairo}
+	--with-alsa=yes \
+	--with-cairo=yes \
+	--with-ffmpeg=yes \
+	--with-managed=no \
+	--with-curl=system \
+	--with-pulse-audio=yes \
+	--with-mcspath=%{_bindir} \
+
+#	--with-mcspath=%{_builddir}/mono-%{included_mono}/mcs \
+#	--with-mono-basic-path=%{_builddir}/mono-basic-%{included_mono} \
 
 %{__make}
 
@@ -182,7 +174,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files -n libmoon
 %defattr(644,root,root,755)
-%doc AUTHORS COPYING README TODO NEWS
+%doc AUTHORS ChangeLog demo-status.txt LICENSE NEWS README TODO wishlist
 %attr(755,root,root) %{_libdir}/libmoon.so.*
 
 %files -n libmoon-devel

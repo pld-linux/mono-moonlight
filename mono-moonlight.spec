@@ -227,10 +227,11 @@ rm -rf $RPM_BUILD_ROOT
 
 %files plugin
 %defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/browser-plugins/libmoonloader.so
 %dir %{_libdir}/moonlight/plugin
-%{_libdir}/moonlight/plugin/libmoonloader.so
-%{_libdir}/moonlight/plugin/libmoonplugin-ff3bridge.so
-%{_libdir}/moonlight/plugin/libmoonplugin.so
+%attr(755,root,root) %{_libdir}/moonlight/plugin/libmoonloader.so
+%attr(755,root,root) %{_libdir}/moonlight/plugin/libmoonplugin-ff3bridge.so
+%attr(755,root,root) %{_libdir}/moonlight/plugin/libmoonplugin.so
 %{_libdir}/moonlight/plugin/Microsoft.VisualBasic.dll*
 %{_libdir}/moonlight/plugin/System.Core.dll*
 %{_libdir}/moonlight/plugin/System.Net.dll*
@@ -241,9 +242,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/moonlight/plugin/System.Windows.dll*
 %{_libdir}/moonlight/plugin/System.Xml.dll*
 %{_libdir}/moonlight/plugin/System.dll*
-# Is there somewhere we could put this that would be universal?
 %{_libdir}/moonlight/plugin/mscorlib.dll*
-%{_libdir}/browser-plugins/libmoonloader.so
 
 %files web-devel
 %defattr(644,root,root,755)
@@ -288,8 +287,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_prefix}/lib/mono/moonlight/System.Windows.Controls.Data.dll*
 %{_prefix}/lib/mono/moonlight/System.Windows.Controls.dll*
 %{_prefix}/lib/mono/moonlight/System.Windows.dll*
-# It may make sense in the future to have a moonlight-gtk package
 %{_datadir}/pkgconfig/moonlight-desktop-2.0.pc
+# It may make sense in the future to have a moonlight-gtk package
 %{_prefix}/lib/mono/moonlight/Moonlight.Gtk.dll*
 %{_prefix}/lib/monodoc/sources/moonlight-gtk.source
 %{_prefix}/lib/monodoc/sources/moonlight-gtk.tree

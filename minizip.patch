@@ -42,6 +42,24 @@
  #include "xaml.h"
  #include "error.h"
  #include "utils.h"
+--- moonlight-2.3/plugin/plugin.cpp~	2010-06-22 20:04:44.000000000 +0300
++++ moonlight-2.3/plugin/plugin.cpp	2010-09-17 00:29:47.027848671 +0300
+@@ -17,6 +17,7 @@
+ #include <fcntl.h>
+ #include <stdlib.h>
+ #include <dlfcn.h>
++#include <minizip/unzip.h>
+ 
+ #include "plugin.h"
+ #include "plugin-spinner.h"
+@@ -30,7 +31,6 @@
+ #include "xap.h"
+ #include "windowless.h"
+ #include "window-gtk.h"
+-#include "unzip.h"
+ #include "deployment.h"
+ #include "uri.h"
+ #include "timemanager.h"
 --- moonlight-2.3/src/Makefile.am	2010-09-16 21:50:45.619581145 +0300
 +++ moonlight-2.3/src/Makefile.am	2010-09-16 21:56:05.021824817 +0300
 @@ -231,12 +231,18 @@

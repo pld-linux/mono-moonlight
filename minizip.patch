@@ -78,7 +78,7 @@
 +++ moonlight-2.3/m4/minizip.m4	2010-09-16 21:53:28.709520586 +0300
 @@ -0,0 +1,11 @@
 +
-+AC_DEFUN([MOONLIGHT_CHECK_EXAMPLES],
++AC_DEFUN([MOONLIGHT_CHECK_MINIZIP],
 +[
 +	dnl
 +	dnl examples

@@ -33,6 +33,7 @@ BuildRequires:	minizip-devel
 BuildRequires:	mono-devel >= 2.6
 BuildRequires:	mono-monodoc
 BuildRequires:	pulseaudio-devel
+BuildRequires:	rpmbuild(macros) >= 1.357
 #BuildRequires:	rsvg2-sharp
 #BuildRequires:	wnck-sharp
 BuildRequires:	xulrunner-devel
@@ -67,14 +68,16 @@ Development files for libmoon.
 Moonlight is an open source implementation of Microsoft Silverlight
 for Unix systems.
 
-%package plugin
+%package -n browser-plugin-moonlight
 Summary:	Novell Moonlight Browser Plugin
 License:	LGPL v2, MIT License (or similar), MS-PL
 Group:		X11/Applications/Multimedia
+Requires:	browser-plugins >= 2.0
 Requires:	libmoon = %{version}-%{release}
 Requires:	mono-core >= 2.6
+Obsoletes:	mono-moonlight-plugin
 
-%description plugin
+%description -n browser-plugin-moonlight
 Novell Moonlight Browser Plugin.
 
 Moonlight is an open source implementation of Microsoft Silverlight
@@ -204,8 +207,8 @@ rm -rf $RPM_BUILD_ROOT
 	DESTDIR=$RPM_BUILD_ROOT
 
 # Symlink the loader into browser-plugins for SUSE
-install -d $RPM_BUILD_ROOT%{_libdir}/browser-plugins
-ln -s %{_libdir}/moonlight/plugin/libmoonloader.so $RPM_BUILD_ROOT%{_libdir}/browser-plugins/libmoonloader.so
+install -d $RPM_BUILD_ROOT%{_browserpluginsdir}
+ln -s %{_libdir}/moonlight/plugin/libmoonloader.so $RPM_BUILD_ROOT%{_browserpluginsdir}/libmoonloader.so
 
 # We don't like nasty .la files
 find $RPM_BUILD_ROOT -name '*.la' | xargs rm -v
@@ -216,18 +219,27 @@ rm -rf $RPM_BUILD_ROOT
 %post	-n libmoon -p /sbin/ldconfig
 %postun	-n libmoon -p /sbin/ldconfig
 
+%post -n browser-plugin-moonlight
+%update_browser_plugins
+
+%postun -n browser-plugin-moonlight
+if [ "$1" = 0 ]; then
+	%update_browser_plugins
+fi
+
 %files -n libmoon
 %defattr(644,root,root,755)
-%doc AUTHORS ChangeLog demo-status.txt LICENSE NEWS README TODO wishlist
-%attr(755,root,root) %{_libdir}/libmoon.so.*
+%doc AUTHORS ChangeLog LICENSE NEWS README TODO
+%attr(755,root,root) %{_libdir}/libmoon.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libmoon.so.0
 
 %files -n libmoon-devel
 %defattr(644,root,root,755)
 %{_libdir}/libmoon.so
 
-%files plugin
+%files -n browser-plugin-moonlight
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/browser-plugins/libmoonloader.so
+%attr(755,root,root) %{_browserpluginsdir}/libmoonloader.so
 %dir %{_libdir}/moonlight/plugin
 %attr(755,root,root) %{_libdir}/moonlight/plugin/libmoonloader.so
 %attr(755,root,root) %{_libdir}/moonlight/plugin/libmoonplugin-ff3bridge.so

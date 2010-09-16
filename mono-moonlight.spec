@@ -242,8 +242,9 @@ fi
 %attr(755,root,root) %{_browserpluginsdir}/libmoonloader.so
 %dir %{_libdir}/moonlight/plugin
 %attr(755,root,root) %{_libdir}/moonlight/plugin/libmoonloader.so
-%attr(755,root,root) %{_libdir}/moonlight/plugin/libmoonplugin-ff3bridge.so
 %attr(755,root,root) %{_libdir}/moonlight/plugin/libmoonplugin.so
+%attr(755,root,root) %{_libdir}/moonlight/plugin/libmoonplugin-curlbridge.so
+%attr(755,root,root) %{_libdir}/moonlight/plugin/libmoonplugin-ff3bridge.so
 %{_libdir}/moonlight/plugin/Microsoft.VisualBasic.dll*
 %{_libdir}/moonlight/plugin/System.Core.dll*
 %{_libdir}/moonlight/plugin/System.Net.dll*
@@ -278,9 +279,10 @@ fi
 %{_prefix}/lib/moonlight/2.0/System.dll*
 %{_prefix}/lib/moonlight/2.0/mscorlib.dll*
 %{_prefix}/lib/moonlight/2.0/respack.exe*
+%{_prefix}/lib/moonlight/2.0/smcs
 %{_prefix}/lib/moonlight/2.0/smcs.exe*
 %{_prefix}/lib/moonlight/2.0/buildversion
-%{_datadir}/pkgconfig/moonlight-web-2.0.pc
+%{_npkgconfigdir}/moonlight-web-2.0.pc
 
 %files desktop
 %defattr(644,root,root,755)
@@ -299,13 +301,13 @@ fi
 %{_prefix}/lib/mono/moonlight/System.Windows.Controls.Data.dll*
 %{_prefix}/lib/mono/moonlight/System.Windows.Controls.dll*
 %{_prefix}/lib/mono/moonlight/System.Windows.dll*
-%{_datadir}/pkgconfig/moonlight-desktop-2.0.pc
+%{_npkgconfigdir}/moonlight-desktop-2.0.pc
 # It may make sense in the future to have a moonlight-gtk package
 %{_prefix}/lib/mono/moonlight/Moonlight.Gtk.dll*
 %{_prefix}/lib/monodoc/sources/moonlight-gtk.source
 %{_prefix}/lib/monodoc/sources/moonlight-gtk.tree
 %{_prefix}/lib/monodoc/sources/moonlight-gtk.zip
-%{_datadir}/pkgconfig/moonlight-gtk-2.0.pc
+%{_npkgconfigdir}/moonlight-gtk-2.0.pc
 
 %files tools
 %defattr(644,root,root,755)

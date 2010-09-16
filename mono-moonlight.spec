@@ -4,6 +4,8 @@
 # - debian repo: http://git.debian.org/?p=pkg-mono/packages/moon.git
 # - fedora http://olea.org/paquetes-rpm/repoview/moonlight.html
 # - ubuntu http://packages.ubuntu.com/search?keywords=moonlight-plugin-mozilla
+# - not compatible with our libunwind (missing demangle.h)
+# - patch to be able to disable libunwind instead of BC
 Summary:	Free Software clone of Silverlight
 Name:		mono-moonlight
 Version:	2.3
@@ -29,6 +31,7 @@ BuildRequires:	pulseaudio-devel
 #BuildRequires:	wnck-sharp
 BuildRequires:	xulrunner-devel
 BuildRequires:	zip
+BuildConflicts:	libunwind-devel
 ExclusiveArch:	%{ix86} %{x8664}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 

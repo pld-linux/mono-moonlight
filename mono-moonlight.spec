@@ -136,6 +136,7 @@ autoreconf -i -Wnone
 	--without-testing \
 	--without-performance \
 	--without-examples \
+	--with-system-minizip=yes \
 	--with-alsa=yes \
 	--with-cairo=yes \
 	--with-ffmpeg=yes \

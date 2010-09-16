@@ -1,0 +1,90 @@
+--- moonlight-2.3/src/utils.h~	2010-06-22 20:04:44.000000000 +0300
++++ moonlight-2.3/src/utils.h	2010-09-13 00:54:55.388070361 +0300
+@@ -19,7 +19,7 @@
+ #include <sys/types.h>
+ 
+ #include "downloader.h"
+-#include "zip/unzip.h"
++#include <minizip/unzip.h>
+ 
+ G_BEGIN_DECLS
+ 
+--- moonlight-2.3/src/file-downloader.cpp~	2010-06-22 20:04:44.000000000 +0300
++++ moonlight-2.3/src/file-downloader.cpp	2010-09-13 00:56:13.602407880 +0300
+@@ -19,7 +19,7 @@
+ #include <errno.h>
+ 
+ #include "file-downloader.h"
+-#include "zip/unzip.h"
++#include <minizip/unzip.h>
+ #include "utils.h"
+ #include "error.h"
+ 
+--- moonlight-2.3/src/fontmanager.cpp~	2010-06-22 20:04:44.000000000 +0300
++++ moonlight-2.3/src/fontmanager.cpp	2010-09-13 00:56:20.776750608 +0300
+@@ -18,7 +18,7 @@
+ #include <ctype.h>
+ 
+ #include "fontmanager.h"
+-#include "zip/unzip.h"
++#include <minizip/unzip.h>
+ #include "debug.h"
+ #include "utils.h"
+ #include "list.h"
+--- moonlight-2.3/src/xap.cpp~	2010-06-22 20:04:44.000000000 +0300
++++ moonlight-2.3/src/xap.cpp	2010-09-13 00:56:28.214463729 +0300
+@@ -18,7 +18,7 @@
+ #include <string.h>
+ #include <stdlib.h>
+ 
+-#include "zip/unzip.h"
++#include <minizip/unzip.h>
+ #include "xaml.h"
+ #include "error.h"
+ #include "utils.h"
+--- moonlight-2.3/src/Makefile.am	2010-09-16 21:50:45.619581145 +0300
++++ moonlight-2.3/src/Makefile.am	2010-09-16 21:56:05.021824817 +0300
+@@ -231,12 +231,18 @@
+ 	writeablebitmap.cpp	\
+ 	xaml.cpp		\
+ 	xap.cpp			\
+-	yuv-converter.cpp	\
++	yuv-converter.cpp
++
++if SYSTEM_MINIZIP
++MOON_LIBS += -lminizip
++else
++libmoon_la_SOURCES += \
+ 	zip/crypt.h		\
+ 	zip/ioapi.c		\
+ 	zip/ioapi.h		\
+ 	zip/unzip.c		\
+ 	zip/unzip.h
++endif
+ 
+ if CODECS_SUPPORTED
+ libmoon_la_SOURCES += pipeline-ui.cpp
+--- moonlight-2.3/configure.ac~	2010-06-22 23:43:58.000000000 +0300
++++ moonlight-2.3/configure.ac	2010-09-16 21:48:52.460099170 +0300
+@@ -68,6 +68,7 @@
+ MOONLIGHT_CHECK_BUILD_CONFIGURATION
+ MOONLIGHT_CHECK_FIREFOX_XPI
+ MOONLIGHT_CHECK_CURL
++MOONLIGHT_CHECK_MINIZIP
+ dnl the chrome check must come after curl
+ MOONLIGHT_CHECK_CHROME_CRX
+ 
+--- /dev/null	2007-02-13 18:29:53.000000000 +0200
++++ moonlight-2.3/m4/minizip.m4	2010-09-16 21:53:28.709520586 +0300
+@@ -0,0 +1,11 @@
++
++AC_DEFUN([MOONLIGHT_CHECK_EXAMPLES],
++[
++	dnl
++	dnl examples
++	dnl
++	
++	AC_ARG_WITH(system_minizip, [  --with-system-minizip=yes|no    Enable system minizip (defaults=no)],[],[with_system_minizip=yes])
++
++	AM_CONDITIONAL(SYSTEM_MINIZIP, test x$with_system_minizip = xyes)
++])

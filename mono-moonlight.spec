@@ -16,6 +16,7 @@ URL:		http://www.mono-project.com/Moonlight
 Source0:	http://ftp.novell.com/pub/mono/sources/moon/%{version}/moonlight-%{version}.tar.bz2
 # Source0-md5:	164c4a5068f85244a0019ce49a6ee629
 Patch0:		minizip.patch
+Patch1:		moon_fix_gdk_pointer_size.patch
 BuildRequires:	alsa-lib-devel
 BuildRequires:	cairo-devel >= 1.8.4
 BuildRequires:	dotnet-gtk-sharp2
@@ -130,22 +131,29 @@ for Unix systems.
 %prep
 %setup -q -n moonlight-%{version}
 %patch0 -p1
+%patch1 -p1
 
 rm -r pixman cairo src/zip curl
 
 %build
-autoreconf -i -Wnone
+%{__libtoolize}
+%{__aclocal} -I m4
+%{__autoconf}
+%{__automake}
 %configure \
+	--enable-dependency-tracking \
 	--without-testing \
 	--without-performance \
 	--without-examples \
 	--with-system-minizip=yes \
 	--with-alsa=yes \
-	--with-cairo=yes \
+	--with-cairo=system \
+	--with-curl=system \
+	--with-ff3=yes \
 	--with-ffmpeg=yes \
 	--with-managed=no \
-	--with-curl=system \
 	--with-pulse-audio=yes \
+	--with-pulseaudio=yes \
 	--with-mcspath=%{_bindir} \
 
 #	--with-mcspath=%{_builddir}/mono-%{included_mono}/mcs \

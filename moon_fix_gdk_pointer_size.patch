@@ -1,0 +1,14 @@
+Ensure that windowless.h loads glib.h, to ensure that 
+GLIB_SIZEOF_VOID_P is defined correctly on 64-bit platforms. This
+fixes a crashing bug when viewing fullscreen Silverlight sites
+
+--- moonlight-2.3/plugin/windowless.h~	2010-06-22 20:04:44.000000000 +0300
++++ moonlight-2.3/plugin/windowless.h	2010-09-16 23:32:47.842349491 +0300
+@@ -14,6 +14,7 @@
+ #ifndef __MOON_WINDOWLESS__
+ #define __MOON_WINDOWLESS__
+ 
++#include <glib.h>
+ #include "moonlight.h"
+ #include "runtime.h"
+ #include "plugin.h"

@@ -1,9 +1,10 @@
 # TODO
 # - find pld packages: rsvg2-sharp wnck-sharp
 # - Release tarballs: http://ftp.novell.com/pub/mono/sources/moon/
-# - debian repo: http://git.debian.org/?p=pkg-mono/packages/moon.git
-# - fedora http://olea.org/paquetes-rpm/repoview/moonlight.html
-# - ubuntu http://packages.ubuntu.com/search?keywords=moonlight-plugin-mozilla
+# - upstream 2.3 spec http://github.com/mono/moon/blob/moon/moon-2-3/moonlight.spec.in
+# - debian 1.0 repo: http://git.debian.org/?p=pkg-mono/packages/moon.git
+# - fedora 1.0.1 http://olea.org/paquetes-rpm/repoview/moonlight.html
+# - ubuntu 2.3 https://launchpad.net/ubuntu/+source/moon/2.3-0ubuntu1
 # - not compatible with our libunwind (missing demangle.h)
 # - patch to be able to disable libunwind instead of BC
 Summary:	Free Software clone of Silverlight
@@ -15,6 +16,10 @@ Group:		X11/Applications/Multimedia
 URL:		http://www.mono-project.com/Moonlight
 Source0:	http://ftp.novell.com/pub/mono/sources/moon/%{version}/moonlight-%{version}.tar.bz2
 # Source0-md5:	164c4a5068f85244a0019ce49a6ee629
+Source1:	http://ftp.novell.com/pub/mono/sources/moon/%{version}/mono-2.6.1.tar.bz2
+# Source1-md5:	ad1286a66e802bf0be01cc09f433db8f
+Source2:	http://ftp.novell.com/pub/mono/sources/moon/%{version}/mono-basic-2.6.tar.bz2
+# Source2-md5:	172b70b30f58bf00834db223ab8d620e
 Patch0:		minizip.patch
 Patch1:		moon_fix_gdk_pointer_size.patch
 BuildRequires:	alsa-lib-devel
@@ -129,17 +134,44 @@ Moonlight is an open source implementation of Microsoft Silverlight
 for Unix systems.
 
 %prep
-%setup -q -n moonlight-%{version}
+%setup -q -n moonlight-%{version} -a1 -a2
 %patch0 -p1
 %patch1 -p1
 
+mv mono-2.6.1 mono
+mv mono-basic-2.6 mono-basic
+
 rm -r pixman cairo src/zip curl
 
+# force rebuild
+rm -f configure
+
 %build
-%{__libtoolize}
-%{__aclocal} -I m4
-%{__autoconf}
-%{__automake}
+topdir=$(pwd)
+# build mono first
+# The plugin requires a complete build of it's own mono
+if [ ! -f mono.installed ]; then
+	cd mono
+	# We have not determined which --enable-minimal options might be safe
+	# so please do not use any of them
+	./configure \
+		--prefix=$topdir/install \
+		--with-mcs-docs=no \
+		--with-ikvm-native=no
+	%{__make} -j1
+	# This gets installed in the build dir so that it gets wiped away
+	# and not installed on the system
+	%{__make} install
+	cd ..
+	touch mono.installed
+fi
+
+if [ ! -f configure ]; then
+	%{__libtoolize}
+	%{__aclocal} -I m4
+	%{__autoconf}
+	%{__automake}
+fi
 %configure \
 	--enable-dependency-tracking \
 	--without-testing \
@@ -149,17 +181,17 @@ rm -r pixman cairo src/zip curl
 	--with-alsa=yes \
 	--with-cairo=system \
 	--with-curl=system \
+	--with-debug=no \
+	--with-ff2=no \
 	--with-ff3=yes \
 	--with-ffmpeg=yes \
 	--with-managed=no \
 	--with-pulse-audio=yes \
 	--with-pulseaudio=yes \
-	--with-mcspath=%{_bindir} \
+	--with-mcspath=$topdir/mono/mcs \
+	--with-mono-basic-path=$topdir/mono-basic \
 
-#	--with-mcspath=%{_builddir}/mono-%{included_mono}/mcs \
-#	--with-mono-basic-path=%{_builddir}/mono-basic-%{included_mono} \
-
-%{__make}
+%{__make} -j1
 
 # The next lines would build the XPI if we wanted it
 # So that the xpi will pick up the custom libmono.so
@@ -168,7 +200,7 @@ rm -r pixman cairo src/zip curl
 
 %install
 rm -rf $RPM_BUILD_ROOT
-%{__make} install \
+%{__make} install -j1 \
 	DESTDIR=$RPM_BUILD_ROOT
 
 # Symlink the loader into browser-plugins for SUSE
@@ -223,8 +255,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_prefix}/lib/moonlight/2.0-redist/System.Xml.Linq.dll*
 %dir %{_prefix}/lib/moonlight/2.0
 %{_prefix}/lib/moonlight/2.0/Microsoft.VisualBasic.dll*
-%{_prefix}/lib/moonlight/2.0-redist/System.Windows.Controls.dll*
-%{_prefix}/lib/moonlight/2.0-redist/System.Xml.Linq.dll*
 %{_prefix}/lib/moonlight/2.0/Mono.CompilerServices.SymbolWriter.dll*
 %{_prefix}/lib/moonlight/2.0/System.Core.dll*
 %{_prefix}/lib/moonlight/2.0/System.Net.dll*
@@ -269,20 +299,24 @@ rm -rf $RPM_BUILD_ROOT
 %files tools
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/mopen
-%{_bindir}/munxap %{_bindir}/mxap %{_bindir}/respack
-%{_bindir}/sockpol %{_bindir}/unrespack %{_bindir}/xaml2html
-%{_bindir}/xamlg %{_mandir}/man1/mopen.1%ext_man
-%{_mandir}/man1/mxap.1%ext_man %{_mandir}/man1/respack.1%ext_man
-%{_mandir}/man1/sockpol.1%ext_man %{_mandir}/man1/svg2xaml.1%ext_man
-%{_mandir}/man1/xamlg.1%ext_man
+%attr(755,root,root) %{_bindir}/munxap
+%attr(755,root,root) %{_bindir}/mxap
+%attr(755,root,root) %{_bindir}/respack
+%attr(755,root,root) %{_bindir}/sockpol
+%attr(755,root,root) %{_bindir}/unrespack
+%attr(755,root,root) %{_bindir}/xaml2html
+%attr(755,root,root) %{_bindir}/xamlg
+%{_mandir}/man1/mopen.1*
+%{_mandir}/man1/mxap.1*
+%{_mandir}/man1/respack.1*
+%{_mandir}/man1/sockpol.1*
+%{_mandir}/man1/svg2xaml.1*
+%{_mandir}/man1/xamlg.1*
 %dir %{_libdir}/moonlight
 %{_libdir}/moonlight/mopen.exe*
-%{_bindir}/munxap %{_bindir}/mxap %{_bindir}/respack
-%{_bindir}/sockpol %{_bindir}/unrespack %{_bindir}/xaml2html
-%{_bindir}/xamlg %{_mandir}/man1/mopen.1%ext_man
-%{_mandir}/man1/mxap.1%ext_man %{_mandir}/man1/respack.1%ext_man
-%{_mandir}/man1/sockpol.1%ext_man %{_mandir}/man1/svg2xaml.1%ext_man
-%{_mandir}/man1/xamlg.1%ext_man %{_libdir}/moonlight/munxap.exe*
-%{_libdir}/moonlight/mxap.exe* %{_libdir}/moonlight/respack.exe*
-%{_libdir}/moonlight/sockpol.exe* %{_libdir}/moonlight/xaml2html.exe*
+%{_libdir}/moonlight/munxap.exe*
+%{_libdir}/moonlight/mxap.exe*
+%{_libdir}/moonlight/respack.exe*
+%{_libdir}/moonlight/sockpol.exe*
+%{_libdir}/moonlight/xaml2html.exe*
 %{_libdir}/moonlight/xamlg.exe*

@@ -30,6 +30,7 @@ BuildRequires:	ffmpeg-devel
 BuildRequires:	gtk+2-devel
 BuildRequires:	libstdc++-devel
 BuildRequires:	minizip-devel
+BuildRequires:	mono-compat-links
 BuildRequires:	mono-devel >= 2.6
 BuildRequires:	mono-monodoc
 BuildRequires:	pulseaudio-devel

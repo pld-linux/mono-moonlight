@@ -7,6 +7,7 @@
 # - ubuntu 2.3 https://launchpad.net/ubuntu/+source/moon/2.3-0ubuntu1
 # - not compatible with our libunwind (missing demangle.h)
 # - patch to be able to disable libunwind instead of BC
+# - http://lists.xensource.com/archives/html/xen-devel/2009-05/msg00075.html
 Summary:	Free Software clone of Silverlight
 Name:		mono-moonlight
 Version:	2.3
@@ -154,7 +155,7 @@ rm -f configure
 topdir=$(pwd)
 # build mono first
 # The plugin requires a complete build of it's own mono
-if [ ! -f mono.installed ]; then
+if [ ! -f mono.built ]; then
 	cd mono
 	# We have not determined which --enable-minimal options might be safe
 	# so please do not use any of them
@@ -163,11 +164,8 @@ if [ ! -f mono.installed ]; then
 		--with-mcs-docs=no \
 		--with-ikvm-native=no
 	%{__make} -j1
-	# This gets installed in the build dir so that it gets wiped away
-	# and not installed on the system
-	%{__make} install
 	cd ..
-	touch mono.installed
+	touch mono.built
 fi
 
 if [ ! -f configure ]; then

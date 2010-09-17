@@ -1,5 +1,5 @@
 # TODO
-# - find pld packages: rsvg2-sharp wnck-sharp
+# - find pld packages: rsvg2-sharp
 # - Release tarballs: http://ftp.novell.com/pub/mono/sources/moon/
 # - upstream 2.3 spec http://github.com/mono/moon/blob/moon/moon-2-3/moonlight.spec.in
 # - debian 1.0 repo: http://git.debian.org/?p=pkg-mono/packages/moon.git
@@ -24,16 +24,26 @@ Source2:	http://ftp.novell.com/pub/mono/sources/moon/%{version}/mono-basic-2.6.t
 Patch0:		minizip.patch
 Patch1:		moon_fix_gdk_pointer_size.patch
 BuildRequires:	alsa-lib-devel
+BuildRequires:	autoconf
+BuildRequires:	automake
+BuildRequires:	bison
 BuildRequires:	cairo-devel >= 1.8.4
+BuildRequires:	dotnet-gnome-desktop-sharp-devel
 BuildRequires:	dotnet-gtk-sharp2
+BuildRequires:	dotnet-gtk-sharp2-devel
 BuildRequires:	expat-devel
 BuildRequires:	ffmpeg-devel
+BuildRequires:	gettext-devel
 BuildRequires:	gtk+2-devel
 BuildRequires:	libstdc++-devel
+BuildRequires:	libtool
 BuildRequires:	minizip-devel
 BuildRequires:	mono-compat-links
+BuildRequires:	mono-csharp
 BuildRequires:	mono-devel >= 2.6
 BuildRequires:	mono-monodoc
+BuildRequires:	ncurses-devel
+BuildRequires:	pkgconfig
 BuildRequires:	pulseaudio-devel
 BuildRequires:	rpmbuild(macros) >= 1.357
 #BuildRequires:	rsvg2-sharp

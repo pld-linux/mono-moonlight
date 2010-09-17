@@ -28,6 +28,7 @@ BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	bison
 BuildRequires:	cairo-devel >= 1.8.4
+BuildRequires:	curl-devel
 BuildRequires:	dotnet-gnome-desktop-sharp-devel
 BuildRequires:	dotnet-gtk-sharp2
 BuildRequires:	dotnet-gtk-sharp2-devel

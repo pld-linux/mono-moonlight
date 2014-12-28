@@ -34,7 +34,7 @@ BuildRequires:	dotnet-gtk-sharp2
 BuildRequires:	dotnet-gtk-sharp2-devel
 BuildRequires:	expat-devel
 BuildRequires:	ffmpeg-devel
-BuildRequires:	gettext-devel
+BuildRequires:	gettext-tools
 BuildRequires:	gtk+2-devel
 BuildRequires:	libstdc++-devel
 BuildRequires:	libtool

@@ -151,8 +151,8 @@ for Unix systems.
 
 %prep
 %setup -q -n moonlight-%{version} -a1 -a2
-%patch0 -p1
-%patch1 -p1
+%patch -P0 -p1
+%patch -P1 -p1
 
 mv mono-2.6.1 mono
 mv mono-basic-2.6 mono-basic
